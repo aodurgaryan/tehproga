@@ -1,0 +1,89 @@
+#include <iostream>
+#include <string>
+struct tag_book {
+    std::string name;//название книги
+    int pages;//кол во страниц
+    double cost;// стоимость
+    tag_book* next;//указатель на структуру tag_book
+};
+class LinkedList {
+public:
+    LinkedList() : head(nullptr) {} //список изначально пуст ну и тело тож
+    ~LinkedList();//объявление деструктора
+    
+    void addToFront(std::string name, int pages, double cost);
+    void addToEnd(std::string name, int pages, double cost );
+    void addAfter(std::string target, std::string name, int pages, double cost);//добавляет новый элемент после элемента с заданным именем.
+    void addBefore(std::string target, std::string name, int pages, double cost);//добавляет новый элемент перед элементом с заданным именем.
+    void removeByName(std::string name);//удаляет элемент с заданным именем из списка.
+    void display();//выводит все элементы списка на экран.
+    
+    
+private:
+    tag_book* head;
+};
+
+
+LinkedList::~LinkedList() {//реализация деструктора. Он освобождает память, занятой элементами связного списка.
+    for (tag_book* temp; head; head = temp) {//цикл, который продолжает выполняться, пока head не станет равным nullptr
+        temp = head->next;//сохраняет указатель на следующий элемент списка в temp
+        delete head;
+    }
+}
+
+void LinkedList::addToFront(std::string name, int pages, double cost) {
+    head = new tag_book{name, pages, cost, head};//новый элемент и устанавливаем его в качестве нового head списка. указывает на прежний head, создавая связь.
+}
+void LinkedList::addToEnd(std::string name, int pages, double cost) {
+    tag_book** temp = &head;//temp является указателем на указатель Node.temp может хранить адрес переменной, которая является указателем на элемент списка (например, head, а также next 
+    while (*temp) temp = &((*temp)->next);// сначала мы проверяем существует ли текущий уезл
+ // если существует то обновляем адрес 
+    *temp = new tag_book{name, pages, cost, nullptr};// создала тут новый элемент и бобавила его в конец списка некст->нулптр 
+}
+void LinkedList::addAfter(std::string target, std::string name, int pages, double cost) {//ща будем реализовывать этот метод 
+    for (tag_book* temp = head; temp; temp = temp->next) {//проходим по всем элементам списка
+        if (temp->name == target) {//совпадает ли имя текущего элемента с целевым 
+            temp->next = new tag_book{name, pages, cost, temp->next};// создаем новый эоемент и добавляем его после найденного
+            return;
+        }
+    }
+}
+
+void LinkedList::addBefore(std::string target, std::string name, int pages, double cost) {
+    tag_book** temp = &head;
+    while (*temp && (*temp)->name != target) temp = &((*temp)->next); // снпчала проверим не равняетсч *темп нулптр И не сопадает ли имя улаз с искомым значением таргет 
+    *temp = new tag_book{name, pages, cost, *temp};// создаем новый элемент и вставляем его перед найденным эоементом 
+}
+
+void LinkedList::removeByName(std::string name) {
+    tag_book** temp = &head;
+    while (*temp && (*temp)->name != name) temp = &((*temp)->next);
+    if (*temp) { //нашли мы такой элемент ?
+        tag_book* toDelete = *temp;// сохраняем указатель на элемент который хотим удалить 
+        *temp = (*temp)->next;// изменяем указатель 
+        delete toDelete;// ура удалили 
+    }
+}
+
+void LinkedList::display() {
+    for (tag_book* temp = head; temp; temp = temp->next)
+        std::cout << "Name: " << temp->name << ", Pages: " << temp->pages << ", Cost: " << temp->cost << '\n';
+}
+
+int main() {
+    LinkedList list;
+
+    list.addToEnd("Morfi", 25, 180);
+    list.addToFront("Friend", 80, 167);
+    list.addAfter("Morfi", "Country", 28, 198);
+    list.addBefore("Morfi", "Lalalend", 35, 170);
+
+    std::cout << "List after additions:\n";// состояние списка
+    list.display();//показываем все эоменты списка е
+
+    list.removeByName("Country");// удаляет кантри из списка 
+    std::cout << "\nList after removing Country:\n";// выодмть сообщение о том что происходит после удаления эоемента 
+    list.display();// снова выводит состояние списка после уложениудалееия 
+
+    return 0;
+}
