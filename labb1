@@ -1,0 +1,115 @@
+#include <iostream>
+#include <string>
+
+struct Node {
+    std::string name;
+    int age;
+    double score;
+    Node* next;
+
+    Node( std::string n, int a, double s)
+        : name(n), age(a), score(s), next(nullptr) {}
+};
+
+class LinkedList {
+private:
+    Node* head;
+
+public:
+    LinkedList() : head(nullptr) {}
+
+    ~LinkedList() {
+        clear();
+    }
+
+    void addAtBeginning(std::string name, int age, double score) {
+        Node* newNode = new Node(name, age, score);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void addAtEnd(std::string name, int age, double score) {
+        Node* newNode = new Node(name, age, score);
+        if (!head) {
+            head = newNode;
+        } else {
+            Node* current = head;
+            while (current->next) {
+                current = current->next;
+            }
+            current->next = newNode;
+        }
+    }
+
+    void addAfter(std::string afterName, std::string name, int age, double score) {
+        Node* current = head;
+        while (current && current->name != afterName) {
+            current = current->next;
+        }
+        if (current) {
+            Node* newNode = new Node(name, age, score);
+            newNode->next = current->next;
+            current->next = newNode;
+        } else {
+            std::cerr << "Элемент с именем " << afterName << " не найден." << std::endl;
+        }
+    }
+
+    void removeByName(const std::string& name) {
+        Node* current = head;
+        Node* prev = nullptr;
+
+        while (current && current->name != name) {
+            prev = current;
+            current = current->next;
+        }
+
+        if (current) {
+            if (prev) {
+                prev->next = current->next;
+            } else {
+                head = current->next;
+            }
+            delete current;
+        } else {
+            std::cerr << "Элемент с именем " << name << " не найден." << std::endl;
+        }
+    }
+
+    void display() const {
+        Node* current = head;
+        while (current) {
+            std::cout << "Имя: " << current->name << ", Возраст: " << current->age << ", Счет: " << current->score << std::endl;
+            current = current->next;
+        }
+    }
+
+    void clear() {
+        while (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+int main() {
+    LinkedList list;
+
+    list.addAtBeginning("Алиса", 30, 85.5);
+    list.addAtEnd("Ваня", 25, 90.0);
+    list.addAtEnd("Яна", 35, 88.5);
+    
+    std::cout << "Список после добавления элементов:" << std::endl;
+    list.display();
+
+    list.addAfter("Алиса", "Даня", 28, 92.0);
+    std::cout << "\n Список после добавления Дани после Алисы :" << std::endl;
+    list.display();
+
+    list.removeByName("Яна");
+    std::cout << "\n Список после удаления Яны:" << std::endl;
+    list.display();
+
+    return 0;
+}
